@@ -1,0 +1,122 @@
+
+
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <title>Cubo 3x3 Branco</title>
+    <style>
+        body {
+            background-color: #121212;
+            margin: 0;
+            height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            perspective: 1200px;
+            overflow: hidden;
+            cursor: grab;
+        }
+        body:active { cursor: grabbing; }
+
+        .scene {
+            width: 300px;
+            height: 300px;
+            transform-style: preserve-3d;
+        }
+
+        .cube-group {
+            width: 100%;
+            height: 100%;
+            position: relative;
+            transform-style: preserve-3d;
+            transform: rotateX(-30deg) rotateY(45deg);
+        }
+
+        .cubie {
+            position: absolute;
+            width: 85px; /* Reduzido para criar o espaçamento */
+            height: 85px;
+            transform-style: preserve-3d;
+        }
+
+        .face {
+            position: absolute;
+            width: 85px;
+            height: 85px;
+            background: #ffffff; /* Todas as faces brancas */
+            border: 1px solid #ccc;
+            box-sizing: border-box;
+            box-shadow: inset 0 0 15px rgba(0,0,0,0.1);
+        }
+
+        /* Posicionamento das faces de cada cubinho individual */
+        .front  { transform: rotateY(0deg) translateZ(42.5px); }
+        .back   { transform: rotateY(180deg) translateZ(42.5px); }
+        .right  { transform: rotateY(90deg) translateZ(42.5px); }
+        .left   { transform: rotateY(-90deg) translateZ(42.5px); }
+        .top    { transform: rotateX(90deg) translateZ(42.5px); }
+        .bottom { transform: rotateX(-90deg) translateZ(42.5px); }
+    </style>
+</head>
+<body>
+
+    <div class="scene">
+        <div class="cube-group" id="cube"></div>
+    </div>
+
+    <script>
+        const cubeGroup = document.getElementById('cube');
+        let isDragging = false;
+        let lastMouseX, lastMouseY;
+        let rotX = -30, rotY = 45;
+
+        // Gerar os 27 cubinhos com espaçamento
+        for (let x = -1; x <= 1; x++) {
+            for (let y = -1; y <= 1; y++) {
+                for (let z = -1; z <= 1; z++) {
+                    const cubie = document.createElement('div');
+                    cubie.className = 'cubie';
+                    
+                    // O multiplicador (100) define a distância entre os centros dos cubos
+                    const tx = x * 100;
+                    const ty = y * 100;
+                    const tz = z * 100;
+                    
+                    cubie.style.transform = `translate3d(${tx}px, ${ty}px, ${tz}px)`;
+
+                    ['front', 'back', 'right', 'left', 'top', 'bottom'].forEach(side => {
+                        const face = document.createElement('div');
+                        face.className = `face ${side}`;
+                        cubie.appendChild(face);
+                    });
+
+                    cubeGroup.appendChild(cubie);
+                }
+            }
+        }
+
+        // Controle de rotação (segurar e arrastar)
+        document.addEventListener('mousedown', (e) => {
+            isDragging = true;
+            lastMouseX = e.clientX;
+            lastMouseY = e.clientY;
+        });
+
+        document.addEventListener('mouseup', () => isDragging = false);
+
+        document.addEventListener('mousemove', (e) => {
+            if (!isDragging) return;
+            const dx = e.clientX - lastMouseX;
+            const dy = e.clientY - lastMouseY;
+
+            rotY += dx * 0.5;
+            rotX -= dy * 0.5;
+
+            cubeGroup.style.transform = `rotateX(${rotX}deg) rotateY(${rotY}deg)`;
+            lastMouseX = e.clientX;
+            lastMouseY = e.clientY;
+        });
+    </script>
+</body>
+</html>
